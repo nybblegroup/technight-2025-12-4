@@ -212,17 +212,83 @@ cd ../python && pip install -r requirements.txt
 cd ../../frontend && npm install
 ```
 
-### Development
+### Configure API Connection (Optional)
+
+The frontend uses a centralized API configuration in `frontend/src/utils/api.ts`. By default, it connects to port 6173.
+
+To change the backend URL, create a `.env` file in the `frontend/` directory:
 
 ```bash
-# Run both frontend and Node backend concurrently
+# frontend/.env
+VITE_API_BASE_URL=http://localhost:6173
+```
+
+To use the Python backend instead:
+
+```bash
+# frontend/.env
+VITE_API_BASE_URL=http://localhost:6174
+```
+
+**Note:** Restart the frontend dev server after changing environment variables.
+
+### Development
+
+**Default Setup (Node Backend):**
+
+By default, `npm run dev` runs the **Node backend** + frontend:
+
+```bash
+# Start Node backend + Frontend (default)
+npm run dev
+```
+
+This will start:
+- Node backend on http://localhost:6173
+- Frontend on http://localhost:5173
+
+**Using Python Backend:**
+
+To use the Python backend instead, run it separately:
+
+```bash
+# Terminal 1: Python backend
+npm run dev:python
+
+# Terminal 2: Frontend
+npm run dev:frontend
+```
+
+**Running Both Backends Simultaneously:**
+
+To test both backends at the same time:
+
+```bash
+# Terminal 1: Node backend + Frontend (default)
 npm run dev
 
-# Or run individually:
-npm run dev:backend    # Node backend on http://localhost:6173
-npm run dev:python     # Python backend on http://localhost:6174
-npm run dev:frontend   # Frontend on http://localhost:5173
+# Terminal 2: Python backend
+npm run dev:python
 ```
+
+Or run all three individually:
+
+```bash
+# Terminal 1: Node backend
+npm run dev:backend
+
+# Terminal 2: Python backend
+npm run dev:python
+
+# Terminal 3: Frontend
+npm run dev:frontend
+```
+
+**Available Commands:**
+- `npm run dev` - Node backend + Frontend (default)
+- `npm run dev:backend` - Node backend only (port 6173)
+- `npm run dev:python` - Python backend only (port 6174)
+- `npm run dev:frontend` - Frontend only (port 5173)
 
 ### Backend Endpoints
 
