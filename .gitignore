@@ -38,3 +38,7 @@ backend/node/prisma/migrations/dev.db-journal
 # Temporary files
 *.tmp
 .cache/
+
+# Python
+venv/
+backend/python/__pycache__/
