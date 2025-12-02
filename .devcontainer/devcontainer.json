@@ -6,6 +6,9 @@
     "ghcr.io/devcontainers/features/node:1": {
       "version": "20"
     },
+    "ghcr.io/devcontainers/features/python:1": {
+      "version": "3.12"
+    },
     "ghcr.io/devcontainers/features/github-cli:1": {}
   },
 
@@ -15,7 +18,9 @@
         "dbaeumer.vscode-eslint",
         "esbenp.prettier-vscode",
         "prisma.prisma",
-        "ms-vscode.vscode-typescript-next"
+        "ms-vscode.vscode-typescript-next",
+        "ms-python.python",
+        "ms-python.vscode-pylance"
       ],
       "settings": {
         "editor.formatOnSave": true,
@@ -30,23 +35,31 @@
     }
   },
 
-  "forwardPorts": [5173, 6173, 7173],
+  "forwardPorts": [5173, 6173, 6174, 7173, 7174],
   "portsAttributes": {
     "5173": {
       "label": "Frontend",
       "onAutoForward": "notify"
     },
     "6173": {
-      "label": "Backend",
+      "label": "Backend (Node)",
+      "onAutoForward": "notify"
+    },
+    "6174": {
+      "label": "Backend (Python)",
       "onAutoForward": "notify"
     },
     "7173": {
-      "label": "Backend (SDK Gen)",
+      "label": "Backend Node (SDK Gen)",
+      "onAutoForward": "ignore"
+    },
+    "7174": {
+      "label": "Backend Python (SDK Gen)",
       "onAutoForward": "ignore"
     }
   },
 
-  "postCreateCommand": "npm install && cd backend/node && npm install && cd ../../frontend && npm install",
+  "postCreateCommand": "npm install && cd backend/node && npm install && cd ../python && pip install -r requirements.txt && cd ../../frontend && npm install",
 
   "remoteUser": "node"
 }
