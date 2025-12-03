@@ -123,7 +123,11 @@ Debes únicamente utilizar una de estas tecnologías para trabajar en modo agén
 
 <img width="1324" height="476" alt="image" src="https://github.com/user-attachments/assets/a74c88c1-897e-4a89-a3f5-8e19b35cbcac" />
 
-You can use the Gemini Key provided with this configuration: https://geminicli.com/docs/get-started/authentication/#gemini-api
+You can use the Gemini Key provided or with your Nybble Group account (https://geminicli.com/docs/get-started/authentication/#gemini-api)
+To enable Gemini 3 Pro, use the /settings command in Gemini CLI and set Preview Features to true.
+You can switch model if needed it with /model command.
+
+<img width="639" height="458" alt="image" src="https://github.com/user-attachments/assets/aeee77a6-6437-4169-a95b-e7d4c9a2a5af" />
 
 | **Claude Code or OpenAI Codex** ➕ | Si lo tienes en tu stack y lo prefieres para esta technight! |
 
