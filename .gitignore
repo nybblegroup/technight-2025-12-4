@@ -42,3 +42,10 @@ backend/node/prisma/migrations/dev.db-journal
 # Python
 venv/
 backend/python/__pycache__/
+backend/python/**/__pycache__/
+*.pyc
+*.pyo
+*.pyd
+
+# Alembic - keep migrations but ignore cache
+backend/python/alembic/**/__pycache__/

@@ -16,7 +16,6 @@ class ExampleResponse(BaseModel):
     entryDate: datetime = Field(..., alias="entry_date")
     description: Optional[str] = None
     isActive: bool = Field(..., alias="is_active")
-    image: Optional[str] = None
     
     class Config:
         from_attributes = True
@@ -41,7 +40,6 @@ class CreateExampleDto(BaseModel):
     title: str = Field(..., min_length=1, max_length=200, description="Title of the example")
     description: Optional[str] = Field(None, max_length=1000, description="Optional description field")
     isActive: Optional[bool] = Field(True, description="Indicates if the example is active")
-    image: Optional[str] = Field(None, max_length=200, description="Optional image URL")
     
     class Config:
         json_schema_extra = {
@@ -62,7 +60,6 @@ class UpdateExampleDto(BaseModel):
     title: Optional[str] = Field(None, min_length=1, max_length=200, description="Title of the example")
     description: Optional[str] = Field(None, max_length=1000, description="Optional description field")
     isActive: Optional[bool] = Field(None, description="Indicates if the example is active")
-    image: Optional[str] = Field(None, max_length=200, description="Optional image URL")
     
     class Config:
         json_schema_extra = {
