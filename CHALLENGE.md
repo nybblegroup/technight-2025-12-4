@@ -21,13 +21,13 @@ Desarrollar una experiencia via web app visualmente atractiva con **gamificació
   - Assistance de meet
   - Fellow summary, etc.
 
-> **Nota**: Simulando información o usando información previa (no necesitas conectar los sistemas ahora pero puedes! 😀)
+> **Nota**: Simulando información con mocks o similares a la realidad o usando información previa (no necesitas conectar los sistemas hoy pero si puedes en 2 horas adelante! 😀)
 
-¡Puedes simular partes del sistema como enviar un mensaje por Slack a X persona o traer X información de tal lado que luego integraremos pero si tienes la información de ejemplo adelante!
+Ej: Puedes simular partes del sistema como enviar un mensaje por Slack a X persona o traer X información del calendario que luego integraremos con el equipo de Nybble Labs y los ganadores.
 
-### Dashboard
+#### Dashboard
 
-Debe tener al menos un **dashboard amigable** para ver las estadísticas y lo que creas interesante del evento / reunión aumentado con AI para sacar conceptos claves y métricas.
+Debe tener al menos una pantalla de **dashboard/resumen amigable** para ver las estadísticas y lo que resulto interesante del feedback del evento/reunión aumentado con AI para sacar conceptos claves y métricas para los equipos.
 
 ### Premio
 
