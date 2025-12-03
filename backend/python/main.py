@@ -24,7 +24,7 @@ app = FastAPI(
     openapi_url="/api/openapi.json",
 )
 
-PORT = int(os.getenv("PORT", 6174))
+PORT = int(os.getenv("PORT", 8080))
 
 # CORS configuration
 app.add_middleware(

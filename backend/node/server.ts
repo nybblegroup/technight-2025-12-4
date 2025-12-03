@@ -9,7 +9,7 @@ import prisma from './database';
 dotenv.config();
 
 const app = express();
-const PORT = process.env.PORT || 6173;
+const PORT = process.env.PORT || 8080;
 
 // Middleware
 app.use(cors());

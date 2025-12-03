@@ -77,8 +77,8 @@ dotnet watch run
 ```
 
 The API will start on:
-- **HTTP**: http://localhost:5000
-- **HTTPS**: https://localhost:5001
+- **HTTP**: http://localhost:8080
+- **HTTPS**: https://localhost:8080
 
 ## 🌐 API Endpoints
 
@@ -168,7 +168,7 @@ Response (200 OK):
 ### Swagger UI
 
 Once the API is running, navigate to:
-- **Swagger UI**: http://localhost:5291/swagger
+- **Swagger UI**: http://localhost:8080/swagger
 
 The Swagger UI provides:
 - Interactive API documentation
@@ -183,7 +183,7 @@ You can try out any endpoint by clicking on it, filling in the parameters, and c
 ### Using Swagger UI (Recommended)
 
 1. Run the API: `dotnet run`
-2. Open browser to http://localhost:5291/swagger
+2. Open browser to http://localhost:8080/swagger
 3. Click on any endpoint to expand it
 4. Click "Try it out" button
 5. Fill in required parameters
@@ -193,29 +193,29 @@ You can try out any endpoint by clicking on it, filling in the parameters, and c
 
 ```bash
 # Health check
-curl http://localhost:5000/api/health
+curl http://localhost:8080/api/health
 
 # Get all examples
-curl http://localhost:5000/api/examples
+curl http://localhost:8080/api/examples
 
 # Get example by ID
-curl http://localhost:5000/api/examples/1
+curl http://localhost:8080/api/examples/1
 
 # Search examples
-curl http://localhost:5000/api/examples/search?name=First
+curl http://localhost:8080/api/examples/search?name=First
 
 # Create example
-curl -X POST http://localhost:5000/api/examples \
+curl -X POST http://localhost:8080/api/examples \
   -H "Content-Type: application/json" \
   -d '{"name":"Test","title":"Test Title","description":"Test description"}'
 
 # Update example
-curl -X PUT http://localhost:5000/api/examples/1 \
+curl -X PUT http://localhost:8080/api/examples/1 \
   -H "Content-Type: application/json" \
   -d '{"name":"Updated Name"}'
 
 # Delete example
-curl -X DELETE http://localhost:5000/api/examples/1
+curl -X DELETE http://localhost:8080/api/examples/1
 ```
 
 ## 🗄️ Database Schema

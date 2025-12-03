@@ -70,7 +70,7 @@ function App() {
         {/* Backend Status */}
         <div style={getStatusStyle(backendHealth.status)}>
           <h3 style={{ margin: '0 0 8px 0' }}>
-            Backend (Port 6173)
+            Backend (Port 8080)
             {backendHealth.status === 'loading' && ' 🔄'}
             {backendHealth.status === 'success' && ' ✅'}
             {backendHealth.status === 'error' && ' ❌'}

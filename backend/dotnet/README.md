@@ -66,9 +66,9 @@ dotnet run
 ```
 
 The API will be available at:
-- HTTP: `http://localhost:5000`
-- HTTPS: `https://localhost:5001`
-- **Swagger UI**: `http://localhost:5000/swagger` (in development mode)
+- HTTP: `http://localhost:8080`
+- HTTPS: `https://localhost:8080`
+- **Swagger UI**: `http://localhost:8080/swagger` (in development mode)
 
 ## API Endpoints
 
@@ -88,8 +88,8 @@ All example endpoints are under `/api/examples`:
 
 ### Swagger/OpenAPI Documentation
 
-- **Swagger UI**: `http://localhost:5000/swagger` (interactive documentation)
-- **OpenAPI JSON**: `http://localhost:5000/swagger/v1/swagger.json`
+- **Swagger UI**: `http://localhost:8080/swagger` (interactive documentation)
+- **OpenAPI JSON**: `http://localhost:8080/swagger/v1/swagger.json`
 
 The Swagger UI provides an interactive interface where you can:
 - Browse all available endpoints
@@ -222,6 +222,6 @@ For production deployment:
 ### Port already in use
 - Change the port in `launchSettings.json` or use environment variable:
   ```bash
-  export ASPNETCORE_URLS="http://localhost:5002"
+  export ASPNETCORE_URLS="http://localhost:8081"
   ```
 

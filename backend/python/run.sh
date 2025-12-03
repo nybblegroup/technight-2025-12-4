@@ -14,8 +14,8 @@ NC='\033[0m' # No Color
 
 # Project root directory
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-PROJECT_ROOT="$(cd "$SCRIPT_DIR/.." && pwd)"
-PYTHON_BACKEND_DIR="$PROJECT_ROOT/backend/python"
+PROJECT_ROOT="$(cd "$SCRIPT_DIR/../.." && pwd)"
+PYTHON_BACKEND_DIR="$SCRIPT_DIR"
 FRONTEND_DIR="$PROJECT_ROOT/frontend"
 VENV_DIR="$PYTHON_BACKEND_DIR/venv"
 
@@ -219,7 +219,7 @@ if [ ! -f ".env" ]; then
     else
         echo -e "${YELLOW}⚠ Creating basic .env file...${NC}"
         cat > .env << EOF
-PORT=6174
+PORT=8080
 DATABASE_URL="postgresql://user:password@localhost:5432/mydb"
 EOF
         echo -e "${YELLOW}⚠ Please edit backend/python/.env with your DATABASE_URL${NC}"
@@ -232,7 +232,7 @@ fi
 cd "$FRONTEND_DIR"
 if [ ! -f ".env" ]; then
     echo -e "${YELLOW}⚠ Frontend .env not found. Creating...${NC}"
-    echo "VITE_API_BASE_URL=http://localhost:6174" > .env
+    echo "VITE_API_BASE_URL=http://localhost:8080" > .env
     echo -e "${GREEN}✓ Frontend .env created${NC}"
 else
     echo -e "${GREEN}✓ Frontend .env found${NC}"
@@ -275,8 +275,8 @@ source venv/bin/activate
 python3 main.py &
 PYTHON_PID=$!
 echo -e "${GREEN}✓ Python backend started (PID: $PYTHON_PID)${NC}"
-echo -e "${BLUE}   → http://localhost:6174${NC}"
-echo -e "${BLUE}   → Swagger: http://localhost:6174/api/swagger${NC}"
+echo -e "${BLUE}   → http://localhost:8080${NC}"
+echo -e "${BLUE}   → Swagger: http://localhost:8080/api/swagger${NC}"
 
 # Wait a moment for Python backend to start
 sleep 2
@@ -289,9 +289,9 @@ echo -e "${GREEN}✓ Frontend started (PID: $FRONTEND_PID)${NC}"
 echo -e "${BLUE}   → http://localhost:5173${NC}"
 
 echo -e "\n${GREEN}=== Servers Running ===${NC}"
-echo -e "${BLUE}Python Backend:${NC} http://localhost:6174"
+echo -e "${BLUE}Python Backend:${NC} http://localhost:8080"
 echo -e "${BLUE}Frontend:${NC}       http://localhost:5173"
-echo -e "${BLUE}Swagger UI:${NC}     http://localhost:6174/api/swagger"
+echo -e "${BLUE}Swagger UI:${NC}     http://localhost:8080/api/swagger"
 echo -e "\n${YELLOW}Press Ctrl+C to stop all servers${NC}\n"
 
 # Wait for both processes

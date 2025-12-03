@@ -11,13 +11,13 @@ graph TB
     end
 
     subgraph "Backend Options"
-        subgraph "Node Backend :6173"
+        subgraph "Node Backend :8080"
             NODE[Express + TypeScript]
             PRISMA[Prisma ORM]
             SWAGGER_NODE[Swagger/OpenAPI]
         end
 
-        subgraph "Python Backend :6174"
+        subgraph "Python Backend :8080"
             PYTHON[FastAPI + Python]
             SQLALCHEMY[SQLAlchemy ORM]
             SWAGGER_PY[Swagger/OpenAPI]
@@ -78,7 +78,7 @@ technight-2025-12/
 - **Language**: TypeScript 5.6
 - **Database ORM**: Prisma
 - **API Documentation**: Swagger/OpenAPI
-- **Port**: 6173
+- **Port**: 8080
 
 ### Backend (Python)
 - **Framework**: FastAPI
@@ -86,7 +86,7 @@ technight-2025-12/
 - **Database ORM**: SQLAlchemy
 - **API Documentation**: Swagger/OpenAPI (auto-generated)
 - **Server**: Uvicorn
-- **Port**: 6174
+- **Port**: 8080
 
 ### Frontend
 - **Framework**: React 19
@@ -161,7 +161,7 @@ The Python backend uses environment variables from `.env` file:
 ```bash
 # Edit backend/python/.env if needed
 # Default configuration:
-PORT=6174
+PORT=8080
 ```
 
 ### 3. Run the Python Backend
@@ -178,10 +178,10 @@ python3 main.py
 ### 4. Verify the Backend is Running
 
 Open your browser and visit:
-- **Health Check**: http://localhost:6174/api/health
-- **Database Health**: http://localhost:6174/api/health/db (checks PostgreSQL connection)
-- **Swagger UI**: http://localhost:6174/api/swagger (interactive API documentation)
-- **OpenAPI Spec**: http://localhost:6174/api/openapi.json
+- **Health Check**: http://localhost:8080/api/health
+- **Database Health**: http://localhost:8080/api/health/db (checks PostgreSQL connection)
+- **Swagger UI**: http://localhost:8080/api/swagger (interactive API documentation)
+- **OpenAPI Spec**: http://localhost:8080/api/openapi.json
 
 You should see a JSON response like:
 ```json
@@ -231,7 +231,7 @@ npm run dev:python
   pip install --user -r requirements.txt
   ```
 
-**Issue: Port 6174 already in use**
+**Issue: Port 8080 already in use**
 - Solution: Change the port in `backend/python/.env`:
   ```
   PORT=6175
@@ -437,7 +437,7 @@ The Python backend uses `psycopg2-binary` which requires system-level PostgreSQL
    ```bash
    # macOS/Linux:
    cat > .env << EOF
-   PORT=6174
+   PORT=8080
    DATABASE_URL="postgresql://user:password@localhost:5432/mydb"
    EOF
    ```
@@ -445,7 +445,7 @@ The Python backend uses `psycopg2-binary` which requires system-level PostgreSQL
    ```powershell
    # Windows (PowerShell):
    @"
-   PORT=6174
+   PORT=8080
    DATABASE_URL="postgresql://user:password@localhost:5432/mydb"
    "@ | Out-File -FilePath .env -Encoding utf8
    ```
@@ -489,15 +489,15 @@ The Python backend uses `psycopg2-binary` which requires system-level PostgreSQL
 2. **Create `.env` file**:
    ```bash
    # macOS/Linux:
-   echo "VITE_API_BASE_URL=http://localhost:6174" > .env
+   echo "VITE_API_BASE_URL=http://localhost:8080" > .env
    ```
 
    ```powershell
    # Windows (PowerShell):
-   "VITE_API_BASE_URL=http://localhost:6174" | Out-File -FilePath .env -Encoding utf8
+   "VITE_API_BASE_URL=http://localhost:8080" | Out-File -FilePath .env -Encoding utf8
    ```
 
-   This tells the frontend to connect to the Python backend on port 6174.
+   This tells the frontend to connect to the Python backend on port 8080.
 
 ### Step 7: Run the Python Backend
 
@@ -527,13 +527,13 @@ The Python backend uses `psycopg2-binary` which requires system-level PostgreSQL
 
    You should see:
    ```
-   Server is running on http://localhost:6174
-   Swagger UI available at http://localhost:6174/api/swagger
-   OpenAPI JSON available at http://localhost:6174/api/openapi.json
+   Server is running on http://localhost:8080
+   Swagger UI available at http://localhost:8080/api/swagger
+   OpenAPI JSON available at http://localhost:8080/api/openapi.json
    ```
 
 4. **Verify it's working**:
-   - Open http://localhost:6174/api/health in your browser
+   - Open http://localhost:8080/api/health in your browser
    - You should see: `{"status":"ok","timestamp":"..."}`
 
 ### Step 8: Run the Frontend
@@ -582,8 +582,8 @@ The Python backend uses `psycopg2-binary` which requires system-level PostgreSQL
 
 #### Issue: Frontend can't connect to backend
 
-- Verify backend is running on http://localhost:6174
-- Check `frontend/.env` has `VITE_API_BASE_URL=http://localhost:6174`
+- Verify backend is running on http://localhost:8080
+- Check `frontend/.env` has `VITE_API_BASE_URL=http://localhost:8080`
 - Restart frontend after changing `.env` file
 
 #### Issue: Database connection errors
@@ -604,7 +604,7 @@ The devcontainer includes:
 - Node.js 20
 - Python 3.12
 - VS Code extensions (ESLint, Prettier, Prisma, Python, Pylance)
-- Auto-forwarding for ports 5173 (frontend), 6173 (Node backend), and 6174 (Python backend)
+- Auto-forwarding for ports 5173 (frontend), 8080 (Node backend), and 8080 (Python backend)
 
 ## Getting Started
 
@@ -626,20 +626,20 @@ cd ../../frontend && npm install
 
 ### Configure API Connection (Optional)
 
-The frontend uses a centralized API configuration in `frontend/src/utils/api.ts`. By default, it connects to port 6173.
+The frontend uses a centralized API configuration in `frontend/src/utils/api.ts`. By default, it connects to port 8080.
 
 To change the backend URL, create a `.env` file in the `frontend/` directory:
 
 ```bash
 # frontend/.env
-VITE_API_BASE_URL=http://localhost:6173
+VITE_API_BASE_URL=http://localhost:8080
 ```
 
 To use the Python backend instead:
 
 ```bash
 # frontend/.env
-VITE_API_BASE_URL=http://localhost:6174
+VITE_API_BASE_URL=http://localhost:8080
 ```
 
 **Note:** Restart the frontend dev server after changing environment variables.
@@ -656,7 +656,7 @@ npm run dev
 ```
 
 This will start:
-- Node backend on http://localhost:6173
+- Node backend on http://localhost:8080
 - Frontend on http://localhost:5173
 
 **Using Python Backend:**
@@ -698,37 +698,37 @@ npm run dev:frontend
 
 **Available Commands:**
 - `npm run dev` - Node backend + Frontend (default)
-- `npm run dev:backend` - Node backend only (port 6173)
-- `npm run dev:python` - Python backend only (port 6174)
+- `npm run dev:backend` - Node backend only (port 8080)
+- `npm run dev:python` - Python backend only (port 8080)
 - `npm run dev:frontend` - Frontend only (port 5173)
 
 ### Backend Endpoints
 
-#### Node Backend (Port 6173)
-- **Health Check**: http://localhost:6173/api/health
-- **Swagger UI**: http://localhost:6173/api/swagger
-- **OpenAPI JSON**: http://localhost:6173/api/openapi.json
-- **OpenAPI YAML**: http://localhost:6173/api/openapi.yaml
+#### Node Backend (Port 8080)
+- **Health Check**: http://localhost:8080/api/health
+- **Swagger UI**: http://localhost:8080/api/swagger
+- **OpenAPI JSON**: http://localhost:8080/api/openapi.json
+- **OpenAPI YAML**: http://localhost:8080/api/openapi.yaml
 
-#### Python Backend (Port 6174)
-- **Health Check**: http://localhost:6174/api/health
-- **Database Health**: http://localhost:6174/api/health/db
-- **Swagger UI**: http://localhost:6174/api/swagger
-- **OpenAPI JSON**: http://localhost:6174/api/openapi.json
-- **OpenAPI YAML**: http://localhost:6174/api/openapi.yaml
+#### Python Backend (Port 8080)
+- **Health Check**: http://localhost:8080/api/health
+- **Database Health**: http://localhost:8080/api/health/db
+- **Swagger UI**: http://localhost:8080/api/swagger
+- **OpenAPI JSON**: http://localhost:8080/api/openapi.json
+- **OpenAPI YAML**: http://localhost:8080/api/openapi.yaml
 
 ### API Documentation
 
 Both backends provide Swagger UI for interactive API documentation:
 
-- **Node Backend**: http://localhost:6173/api/swagger
-- **Python Backend**: http://localhost:6174/api/swagger
+- **Node Backend**: http://localhost:8080/api/swagger
+- **Python Backend**: http://localhost:8080/api/swagger
 
 You can also view the OpenAPI specifications:
-- **Node Backend JSON**: http://localhost:6173/api/openapi.json
-- **Node Backend YAML**: http://localhost:6173/api/openapi.yaml
-- **Python Backend JSON**: http://localhost:6174/api/openapi.json
-- **Python Backend YAML**: http://localhost:6174/api/openapi.yaml
+- **Node Backend JSON**: http://localhost:8080/api/openapi.json
+- **Node Backend YAML**: http://localhost:8080/api/openapi.yaml
+- **Python Backend JSON**: http://localhost:8080/api/openapi.json
+- **Python Backend YAML**: http://localhost:8080/api/openapi.yaml
 
 ### Build for Production
 
@@ -837,7 +837,7 @@ cd backend/node
 npm run prisma:migrate
 ```
 
-4. **Verify database connection**: Visit http://localhost:6173/api/health
+4. **Verify database connection**: Visit http://localhost:8080/api/health
 
 ### Python Backend (SQLAlchemy ORM)
 
@@ -855,8 +855,8 @@ DATABASE_URL="postgresql://user:password@localhost:5432/mydb"
    - Database health check function
 
 3. **Check database connection**:
-   - **Basic health**: http://localhost:6174/api/health
-   - **Database health**: http://localhost:6174/api/health/db
+   - **Basic health**: http://localhost:8080/api/health
+   - **Database health**: http://localhost:8080/api/health/db
 
 4. **Create models** by extending `Base` from `database.py`:
 ```python

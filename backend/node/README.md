@@ -83,7 +83,7 @@ A `.env.example` file has been created with the database configuration:
 
 ```env
 DATABASE_URL="postgresql://postgres:mysecretpassword@localhost:5432/technightdb-node?schema=public"
-PORT=6173
+PORT=8080
 ```
 
 Copy this to `.env` to configure your local environment.
@@ -113,9 +113,9 @@ npm start
 ## Swagger Documentation
 
 Once the server is running, you can access:
-- Swagger UI: http://localhost:6173/api/swagger
-- OpenAPI JSON: http://localhost:6173/api/openapi.json
-- OpenAPI YAML: http://localhost:6173/api/openapi.yaml
+- Swagger UI: http://localhost:8080/api/swagger
+- OpenAPI JSON: http://localhost:8080/api/openapi.json
+- OpenAPI YAML: http://localhost:8080/api/openapi.yaml
 
 ## Testing
 
@@ -127,25 +127,25 @@ You can test the API using curl:
 
 ```bash
 # Get all examples
-curl http://localhost:6173/api/examples
+curl http://localhost:8080/api/examples
 
 # Get example by ID
-curl http://localhost:6173/api/examples/1
+curl http://localhost:8080/api/examples/1
 
 # Search examples
-curl http://localhost:6173/api/examples/search?name=First
+curl http://localhost:8080/api/examples/search?name=First
 
 # Create new example
-curl -X POST http://localhost:6173/api/examples \
+curl -X POST http://localhost:8080/api/examples \
   -H "Content-Type: application/json" \
   -d '{"name":"Test","title":"Test Title","description":"A test example","isActive":true}'
 
 # Update example
-curl -X PUT http://localhost:6173/api/examples/1 \
+curl -X PUT http://localhost:8080/api/examples/1 \
   -H "Content-Type: application/json" \
   -d '{"title":"Updated Title"}'
 
 # Delete example
-curl -X DELETE http://localhost:6173/api/examples/1
+curl -X DELETE http://localhost:8080/api/examples/1
 ```
 
