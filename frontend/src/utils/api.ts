@@ -7,6 +7,29 @@ export interface HealthResponse {
   timestamp: string;
 }
 
+export interface Example {
+  id: number;
+  name: string;
+  title: string;
+  entryDate: string;
+  description: string | null;
+  isActive: boolean;
+}
+
+export interface CreateExampleDto {
+  name: string;
+  title: string;
+  description?: string;
+  isActive?: boolean;
+}
+
+export interface UpdateExampleDto {
+  name?: string;
+  title?: string;
+  description?: string;
+  isActive?: boolean;
+}
+
 export interface ApiError {
   message: string;
   status?: number;
@@ -26,7 +49,13 @@ async function apiFetch<T>(endpoint: string, options?: RequestInit): Promise<T> 
     });
 
     if (!response.ok) {
-      throw new Error(`HTTP error! status: ${response.status}`);
+      const errorText = await response.text();
+      throw new Error(`HTTP error! status: ${response.status}, message: ${errorText}`);
+    }
+
+    // Handle 204 No Content
+    if (response.status === 204) {
+      return {} as T;
     }
 
     return await response.json();
@@ -45,14 +74,21 @@ export const api = {
     get: () => apiFetch<HealthResponse>('/api/health'),
   },
 
-  // Add more API methods here as needed
-  // Example:
-  // users: {
-  //   getAll: () => apiFetch<User[]>('/api/users'),
-  //   getById: (id: string) => apiFetch<User>(`/api/users/${id}`),
-  //   create: (data: CreateUserDto) => apiFetch<User>('/api/users', {
-  //     method: 'POST',
-  //     body: JSON.stringify(data),
-  //   }),
-  // },
+  // Examples endpoints
+  examples: {
+    getAll: () => apiFetch<Example[]>('/api/examples'),
+    getById: (id: number) => apiFetch<Example>(`/api/examples/${id}`),
+    search: (name: string) => apiFetch<Example[]>(`/api/examples/search?name=${encodeURIComponent(name)}`),
+    create: (data: CreateExampleDto) => apiFetch<Example>('/api/examples', {
+      method: 'POST',
+      body: JSON.stringify(data),
+    }),
+    update: (id: number, data: UpdateExampleDto) => apiFetch<Example>(`/api/examples/${id}`, {
+      method: 'PUT',
+      body: JSON.stringify(data),
+    }),
+    delete: (id: number) => apiFetch<void>(`/api/examples/${id}`, {
+      method: 'DELETE',
+    }),
+  },
 };
