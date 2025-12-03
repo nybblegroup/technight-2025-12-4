@@ -39,27 +39,15 @@
     }
   },
 
-  "forwardPorts": [5173, 6173, 6174, 7173, 7174],
+  "forwardPorts": [5173, 8080],
   "portsAttributes": {
     "5173": {
       "label": "Frontend",
       "onAutoForward": "notify"
     },
-    "6173": {
-      "label": "Backend (Node)",
+    "8080": {
+      "label": "Backend",
       "onAutoForward": "notify"
-    },
-    "6174": {
-      "label": "Backend (Python)",
-      "onAutoForward": "notify"
-    },
-    "7173": {
-      "label": "Backend Node (SDK Gen)",
-      "onAutoForward": "ignore"
-    },
-    "7174": {
-      "label": "Backend Python (SDK Gen)",
-      "onAutoForward": "ignore"
     }
   },
 

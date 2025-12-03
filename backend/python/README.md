@@ -62,11 +62,22 @@ cp .env.example .env
 Edit `.env` with your database configuration:
 
 ```env
-PORT=8080
-DATABASE_URL="postgresql://postgres:mysecretpassword@localhost:5432/technightdb-python?schema=public"
+PORT=6174
+DATABASE_URL="postgresql://postgres:mysecretpassword@localhost:5432/technightdb-python"
 ```
 
-#### 4. Start the Server
+#### 4. Run Database Migrations
+
+```bash
+# Aplicar todas las migraciones pendientes
+alembic upgrade head
+```
+
+Esto creará las tablas necesarias en tu base de datos PostgreSQL. Si es la primera vez, creará la tabla `example`.
+
+**Nota**: El script `run.sh` ejecuta esto automáticamente.
+
+#### 5. Start the Server
 
 ```bash
 python3 main.py
@@ -74,55 +85,58 @@ python3 main.py
 
 ## API Endpoints
 
-Once the server is running on http://localhost:8080:
+Once the server is running on http://localhost:6174:
 
 ### Documentation
-- **Swagger UI**: http://localhost:8080/api/swagger
-- **OpenAPI JSON**: http://localhost:8080/api/openapi.json
-- **OpenAPI YAML**: http://localhost:8080/api/openapi.yaml
+- **Swagger UI**: http://localhost:6174/api/swagger
+- **OpenAPI JSON**: http://localhost:6174/api/openapi.json
+- **OpenAPI YAML**: http://localhost:6174/api/openapi.yaml
 
 ### Health Checks
-- **API Health**: http://localhost:8080/api/health
-- **Database Health**: http://localhost:8080/api/health/db
+- **API Health**: http://localhost:6174/api/health
+- **Database Health**: http://localhost:6174/api/health/db
 
 ### Example CRUD Operations
 
-The backend includes a complete Example entity implementation (matching the Node.js, Spring Boot, and .NET versions).
+The backend includes a complete Example entity implementation with full database support (matching the Node.js, Spring Boot, and .NET versions).
 
-**Note**: The Python backend currently uses an in-memory data structure. Database integration is planned.
+**Database Setup**: Before using the CRUD endpoints, make sure to:
+1. Configure `DATABASE_URL` in `.env`
+2. Run migrations: `python3 migrations.py`
+3. Verify database connection: http://localhost:6174/api/health/db
 
 #### Get all examples
 ```bash
-curl http://localhost:8080/api/examples
+curl http://localhost:6174/api/examples
 ```
 
 #### Get example by ID
 ```bash
-curl http://localhost:8080/api/examples/1
+curl http://localhost:6174/api/examples/1
 ```
 
 #### Search examples
 ```bash
-curl http://localhost:8080/api/examples/search?name=First
+curl http://localhost:6174/api/examples/search?name=First
 ```
 
 #### Create new example
 ```bash
-curl -X POST http://localhost:8080/api/examples \
+curl -X POST http://localhost:6174/api/examples \
   -H "Content-Type: application/json" \
   -d '{"name":"Test","title":"Test Title","description":"A test example","isActive":true}'
 ```
 
 #### Update example
 ```bash
-curl -X PUT http://localhost:8080/api/examples/1 \
+curl -X PUT http://localhost:6174/api/examples/1 \
   -H "Content-Type: application/json" \
   -d '{"title":"Updated Title"}'
 ```
 
 #### Delete example
 ```bash
-curl -X DELETE http://localhost:8080/api/examples/1
+curl -X DELETE http://localhost:6174/api/examples/1
 ```
 
 ## Project Structure
@@ -131,8 +145,16 @@ curl -X DELETE http://localhost:8080/api/examples/1
 backend/python/
 ├── main.py           # FastAPI application entry point
 ├── database.py       # SQLAlchemy database configuration
+├── models.py         # SQLAlchemy models (Example entity)
+├── schemas.py        # Pydantic schemas (DTOs for request/response)
+├── migrations.py     # Helper script for Alembic migrations
+├── alembic/          # Alembic migration files
+│   ├── versions/     # Migration scripts
+│   └── env.py        # Alembic configuration
+├── alembic.ini        # Alembic configuration file
 ├── requirements.txt  # Python dependencies
 ├── run.sh           # Automated setup and run script
+├── MIGRATIONS.md    # Migration guide (see this for details)
 ├── .env             # Environment variables (create from .env.example)
 └── venv/            # Virtual environment (created by run.sh)
 ```
@@ -142,14 +164,74 @@ backend/python/
 - **FastAPI**: Modern, fast web framework
 - **Uvicorn**: ASGI server
 - **SQLAlchemy**: SQL toolkit and ORM
+- **Alembic**: Database migration tool (similar to Prisma migrations)
 - **psycopg2-binary**: PostgreSQL adapter
 - **python-dotenv**: Environment variable management
 - **pydantic**: Data validation
 
 ## Environment Variables
 
-- `PORT`: Server port (default: 8080)
-- `DATABASE_URL`: PostgreSQL connection string
+- `PORT`: Server port (default: 6174)
+- `DATABASE_URL`: PostgreSQL connection string (format: `postgresql://user:password@host:port/database`)
+
+## Database Migrations
+
+Este backend usa **Alembic** para manejar migraciones de base de datos de forma automática, similar a cómo Prisma lo hace en Node.js o Entity Framework en .NET.
+
+### Migraciones Automáticas
+
+Cuando modificas un modelo en `models.py` (por ejemplo, agregas un campo), Alembic puede detectar los cambios y generar migraciones automáticamente.
+
+### Comandos Básicos
+
+**Aplicar todas las migraciones pendientes:**
+```bash
+alembic upgrade head
+```
+
+**Crear una nueva migración después de modificar modelos:**
+```bash
+# Alembic detecta los cambios automáticamente
+alembic revision --autogenerate -m "Add new field to Example"
+alembic upgrade head
+```
+
+**Ver estado actual:**
+```bash
+alembic current
+```
+
+**Revertir última migración:**
+```bash
+alembic downgrade -1
+```
+
+### Ejemplo: Agregar un Campo
+
+1. Modifica `models.py` agregando el nuevo campo
+2. Genera la migración: `alembic revision --autogenerate -m "Add email field"`
+3. Revisa el archivo generado en `alembic/versions/`
+4. Aplica: `alembic upgrade head`
+
+**📖 Para más detalles, consulta [MIGRATIONS.md](./MIGRATIONS.md)**
+
+### Migración Inicial
+
+La primera vez que configures la base de datos, ejecuta:
+
+```bash
+alembic upgrade head
+```
+
+Esto creará la tabla `example` con el siguiente esquema:
+- `id` (integer, primary key, auto-increment)
+- `name` (varchar 200, required)
+- `title` (varchar 200, required)
+- `entry_date` (timestamp, auto-set on creation)
+- `description` (varchar 1000, optional)
+- `is_active` (boolean, default: true)
+
+El script `run.sh` ejecuta automáticamente las migraciones al iniciar.
 
 ## Development
 
@@ -209,12 +291,31 @@ PORT=8081
 1. Ensure PostgreSQL is running
 2. Check the `DATABASE_URL` in `.env`
 3. Verify database credentials
-4. Test connection: http://localhost:8080/api/health/db
+4. Test connection: http://localhost:6174/api/health/db
+5. Run migrations: `alembic upgrade head`
+
+### Migration errors
+- **"Target database is not up to date"**: Run `alembic upgrade head`
+- **"Can't locate revision"**: Check migration history with `alembic history`
+- **"Multiple heads detected"**: Merge with `alembic merge heads -m "Merge branches"`
+- See [MIGRATIONS.md](./MIGRATIONS.md) for detailed troubleshooting
+
+## Example Entity
+
+The `Example` entity matches the structure used in Node.js, .NET, and Spring Boot backends:
+
+- `id` (int) - Primary key, auto-generated
+- `name` (string) - Name of the example (required, max 200 chars)
+- `title` (string) - Title of the example (required, max 200 chars)
+- `entryDate` (datetime) - Date when the entry was created (auto-set)
+- `description` (string?) - Optional description (max 1000 chars)
+- `isActive` (bool) - Active status (default: true)
 
 ## Notes
 
-- The backend runs on port 8080 (same as other backend implementations)
+- The backend runs on port 6174 by default (configurable via `PORT` env var)
 - All backends share the same API contract for interoperability
 - Swagger documentation is auto-generated from the code
 - CORS is enabled for frontend development
+- Database migrations are automatically run by `run.sh` if `DATABASE_URL` is configured
 
