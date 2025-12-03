@@ -68,7 +68,7 @@ dotnet run
 The API will be available at:
 - HTTP: `http://localhost:8080`
 - HTTPS: `https://localhost:8080`
-- **Swagger UI**: `http://localhost:8080/swagger` (in development mode)
+- **Swagger UI**: `http://localhost:8080/api/swagger` (in development mode)
 
 ## API Endpoints
 
@@ -88,7 +88,7 @@ All example endpoints are under `/api/examples`:
 
 ### Swagger/OpenAPI Documentation
 
-- **Swagger UI**: `http://localhost:8080/swagger` (interactive documentation)
+- **Swagger UI**: `http://localhost:8080/api/swagger` (interactive documentation)
 - **OpenAPI JSON**: `http://localhost:8080/swagger/v1/swagger.json`
 
 The Swagger UI provides an interactive interface where you can:

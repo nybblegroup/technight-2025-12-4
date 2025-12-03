@@ -53,7 +53,7 @@ mvn spring-boot:run
 
 Open your browser and visit:
 - 🏥 Health Check: http://localhost:8080/api/health
-- 📚 Swagger UI: http://localhost:8080/swagger
+- 📚 Swagger UI: http://localhost:8080/api/swagger
 
 You should see:
 - Health check returning `{"status":"healthy",...}`
@@ -62,7 +62,7 @@ You should see:
 ### 5. Test the API
 
 Using Swagger UI:
-1. Go to http://localhost:8080/swagger
+1. Go to http://localhost:8080/api/swagger
 2. Click on `GET /api/examples`
 3. Click "Try it out"
 4. Click "Execute"
@@ -103,7 +103,7 @@ The application includes:
 | Service | URL |
 |---------|-----|
 | API Base | http://localhost:8080 |
-| Swagger UI | http://localhost:8080/swagger |
+| Swagger UI | http://localhost:8080/api/swagger |
 | OpenAPI JSON | http://localhost:8080/api/openapi |
 | Health Check | http://localhost:8080/api/health |
 | Database | postgresql://localhost:5432/technightdb-springboot |

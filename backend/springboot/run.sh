@@ -58,7 +58,7 @@ mvn clean install -DskipTests
 echo ""
 echo "🏃 Starting Spring Boot application..."
 echo "📍 API will be available at: http://localhost:8080"
-echo "📚 Swagger UI: http://localhost:8080/swagger"
+echo "📚 Swagger UI: http://localhost:8080/api/swagger"
 echo "🏥 Health Check: http://localhost:8080/api/health"
 echo ""
 echo "Press Ctrl+C to stop the application"

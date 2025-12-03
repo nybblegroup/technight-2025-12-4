@@ -80,7 +80,7 @@ The API will be available at: `http://localhost:8080`
 
 Once the application is running, access:
 
-- **Swagger UI**: http://localhost:8080/swagger
+- **Swagger UI**: http://localhost:8080/api/swagger
 - **OpenAPI JSON**: http://localhost:8080/api/openapi
 - **Health Check**: http://localhost:8080/api/health
 

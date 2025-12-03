@@ -43,7 +43,7 @@ if (app.Environment.IsDevelopment())
     app.UseSwaggerUI(options =>
     {
         options.SwaggerEndpoint("/swagger/v1/swagger.json", "TechnightApi v1");
-        options.RoutePrefix = "swagger";
+        options.RoutePrefix = "api/swagger";
         options.DocumentTitle = "TechnightApi - Swagger UI";
     });
 }

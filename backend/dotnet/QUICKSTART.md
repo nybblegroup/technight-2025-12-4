@@ -168,7 +168,7 @@ Response (200 OK):
 ### Swagger UI
 
 Once the API is running, navigate to:
-- **Swagger UI**: http://localhost:8080/swagger
+- **Swagger UI**: http://localhost:8080/api/swagger
 
 The Swagger UI provides:
 - Interactive API documentation
@@ -183,7 +183,7 @@ You can try out any endpoint by clicking on it, filling in the parameters, and c
 ### Using Swagger UI (Recommended)
 
 1. Run the API: `dotnet run`
-2. Open browser to http://localhost:8080/swagger
+2. Open browser to http://localhost:8080/api/swagger
 3. Click on any endpoint to expand it
 4. Click "Try it out" button
 5. Fill in required parameters

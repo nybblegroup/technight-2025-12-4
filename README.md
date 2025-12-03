@@ -710,12 +710,22 @@ npm run dev:frontend
 - **OpenAPI JSON**: http://localhost:8080/api/openapi.json
 - **OpenAPI YAML**: http://localhost:8080/api/openapi.yaml
 
+#### Spring Boot Backend (Port 8080)
+- **Health Check**: http://localhost:8080/api/health
+- **Swagger UI**: http://localhost:8080/api/swagger
+- **OpenAPI JSON**: http://localhost:8080/api/openapi
+
 #### Python Backend (Port 8080)
 - **Health Check**: http://localhost:8080/api/health
 - **Database Health**: http://localhost:8080/api/health/db
 - **Swagger UI**: http://localhost:8080/api/swagger
 - **OpenAPI JSON**: http://localhost:8080/api/openapi.json
 - **OpenAPI YAML**: http://localhost:8080/api/openapi.yaml
+
+#### .NET Backend (Port 8080)
+- **Health Check**: http://localhost:8080/api/health
+- **Swagger UI**: http://localhost:8080/api/swagger
+- **OpenAPI JSON**: http://localhost:8080/api/swagger/v1/swagger.json
 
 ### API Documentation
 
