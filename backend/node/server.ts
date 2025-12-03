@@ -1,11 +1,9 @@
 import express, { Request, Response } from 'express';
 import cors from 'cors';
 import dotenv from 'dotenv';
-import swaggerJsdoc from 'swagger-jsdoc';
-import swaggerUi from 'swagger-ui-express';
-import fs from 'fs';
-import path from 'path';
-import yaml from 'js-yaml';
+import { setupSwaggerRoutes } from './routes/swagger.routes';
+import exampleRoutes from './routes/example.routes';
+import prisma from './database';
 
 // Load environment variables
 dotenv.config();
@@ -17,42 +15,11 @@ const PORT = process.env.PORT || 6173;
 app.use(cors());
 app.use(express.json());
 
-// Swagger configuration
-const swaggerOptions = {
-  definition: {
-    openapi: '3.0.0',
-    info: {
-      title: 'Backend API',
-      version: '1.0.0',
-      description: 'Minimal backend API with health check endpoint',
-    },
-    servers: [
-      {
-        url: `http://localhost:${PORT}`,
-        description: 'Development server',
-      },
-    ],
-  },
-  apis: ['./server.ts'], // Path to the API docs
-};
+// Setup Swagger/OpenAPI routes
+app.use('/api', setupSwaggerRoutes(PORT));
 
-const swaggerSpec = swaggerJsdoc(swaggerOptions);
-
-// Serve Swagger UI
-app.use('/api/swagger', swaggerUi.serve, swaggerUi.setup(swaggerSpec));
-
-// Serve OpenAPI spec as JSON
-app.get('/api/openapi.json', (req: Request, res: Response) => {
-  res.setHeader('Content-Type', 'application/json');
-  res.send(swaggerSpec);
-});
-
-// Serve OpenAPI spec as YAML
-app.get('/api/openapi.yaml', (req: Request, res: Response) => {
-  res.setHeader('Content-Type', 'text/yaml');
-  const yamlSpec = yaml.dump(swaggerSpec);
-  res.send(yamlSpec);
-});
+// Setup API routes
+app.use('/api/examples', exampleRoutes);
 
 /**
  * @swagger
@@ -94,15 +61,17 @@ const server = app.listen(PORT, () => {
 });
 
 // Graceful shutdown
-process.on('SIGTERM', () => {
+process.on('SIGTERM', async () => {
   console.log('SIGTERM signal received: closing HTTP server');
+  await prisma.$disconnect();
   server.close(() => {
     console.log('HTTP server closed');
   });
 });
 
-process.on('SIGINT', () => {
+process.on('SIGINT', async () => {
   console.log('SIGINT signal received: closing HTTP server');
+  await prisma.$disconnect();
   server.close(() => {
     console.log('HTTP server closed');
     process.exit(0);

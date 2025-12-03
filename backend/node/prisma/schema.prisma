@@ -10,11 +10,26 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-// Example model - you can add your own models here
-// model User {
-//   id        Int      @id @default(autoincrement())
-//   email     String   @unique
-//   name      String?
-//   createdAt DateTime @default(now())
-//   updatedAt DateTime @updatedAt
-// }
+/// Example entity representing a sample record
+model Example {
+  /// Unique identifier for the example
+  id          Int       @id @default(autoincrement())
+  
+  /// Name of the example
+  name        String    @db.VarChar(200)
+  
+  /// Title of the example
+  title       String    @db.VarChar(200)
+  
+  /// Date when the example was entered
+  entryDate   DateTime  @default(now()) @map("entry_date")
+  
+  /// Optional description field
+  description String?   @db.VarChar(1000)
+  
+  /// Indicates if the example is active
+  isActive    Boolean   @default(true) @map("is_active")
+
+  @@index([entryDate], name: "ix_example_entry_date")
+  @@map("example")
+}
