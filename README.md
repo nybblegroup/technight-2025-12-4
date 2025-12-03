@@ -1,6 +1,6 @@
 # Technight 2025-12 Monorepo
 
-A minimal monorepo setup with frontend (React + Vite) and dual backend options (Node/Express + TypeScript + Prisma OR Python/FastAPI). The frontend connects directly to the backend APIs.
+A minimal monorepo setup with frontend (React + Vite) and multiple backend options (Node/Express, Python/FastAPI, Java/Spring Boot, or .NET Core). The frontend connects directly to the backend APIs.
 
 ## Architecture Diagram
 
@@ -10,7 +10,7 @@ graph TB
         FE[React + Vite + TypeScript]
     end
 
-    subgraph "Backend Options"
+    subgraph "Backend Options - Choose One"
         subgraph "Node Backend :8080"
             NODE[Express + TypeScript]
             PRISMA[Prisma ORM]
@@ -22,6 +22,18 @@ graph TB
             SQLALCHEMY[SQLAlchemy ORM]
             SWAGGER_PY[Swagger/OpenAPI]
         end
+
+        subgraph "Java Backend :8080"
+            JAVA[Spring Boot + Java]
+            JPA[JPA/Hibernate ORM]
+            SWAGGER_JAVA[Swagger/OpenAPI]
+        end
+
+        subgraph ".NET Backend :8080"
+            DOTNET[ASP.NET Core + C#]
+            EF[Entity Framework]
+            SWAGGER_NET[Swagger/OpenAPI]
+        end
     end
 
     subgraph "Database"
@@ -30,15 +42,23 @@ graph TB
 
     FE -->|Direct HTTP Requests<br/>fetch API| NODE
     FE -.->|Direct HTTP Requests<br/>fetch API| PYTHON
+    FE -.->|Direct HTTP Requests<br/>fetch API| JAVA
+    FE -.->|Direct HTTP Requests<br/>fetch API| DOTNET
 
     NODE --> PRISMA
     PYTHON --> SQLALCHEMY
+    JAVA --> JPA
+    DOTNET --> EF
     PRISMA --> DB
     SQLALCHEMY --> DB
+    JPA --> DB
+    EF --> DB
 
     style FE fill:#61dafb,stroke:#333,stroke-width:2px
     style NODE fill:#68a063,stroke:#333,stroke-width:2px
     style PYTHON fill:#3776ab,stroke:#333,stroke-width:2px
+    style JAVA fill:#f89820,stroke:#333,stroke-width:2px
+    style DOTNET fill:#512bd4,stroke:#333,stroke-width:2px
     style DB fill:#336791,stroke:#333,stroke-width:2px
 ```
 
@@ -46,9 +66,11 @@ graph TB
 - **Frontend** connects directly to backends using fetch API
 - **Node Backend** uses Prisma ORM for database operations
 - **Python Backend** uses SQLAlchemy ORM for database operations
-- Both backends connect to **PostgreSQL** database
-- Both backends expose **Swagger UI** for interactive API documentation
-- Backends can run **simultaneously** on different ports
+- **Java Backend** uses JPA/Hibernate ORM for database operations
+- **.NET Backend** uses Entity Framework for database operations
+- All backends connect to **PostgreSQL** database
+- All backends expose **Swagger UI** for interactive API documentation
+- Backends can run **simultaneously** on different ports (choose one for your project)
 - API base URL is **configurable** via environment variables
 
 ## Project Structure
@@ -59,9 +81,13 @@ technight-2025-12/
 │   ├── node/            # Express + TypeScript backend with Swagger
 │   │   ├── prisma/      # Prisma schema and migrations
 │   │   └── server.ts    # Main entry point
-│   └── python/          # FastAPI + Python backend with Swagger
-│       ├── database.py  # SQLAlchemy database configuration
-│       └── main.py      # Main entry point
+│   ├── python/          # FastAPI + Python backend with Swagger
+│   │   ├── database.py  # SQLAlchemy database configuration
+│   │   └── main.py      # Main entry point
+│   ├── java/            # Spring Boot + Java backend with Swagger (optional)
+│   │   └── src/         # Java source files
+│   └── dotnet/          # ASP.NET Core + C# backend with Swagger (optional)
+│       └── Controllers/ # .NET controllers
 ├── frontend/            # React + Vite + TypeScript
 │   └── src/
 │       ├── utils/
@@ -86,6 +112,20 @@ technight-2025-12/
 - **Database ORM**: SQLAlchemy
 - **API Documentation**: Swagger/OpenAPI (auto-generated)
 - **Server**: Uvicorn
+- **Port**: 8080
+
+### Backend (Java/Spring Boot)
+- **Framework**: Spring Boot
+- **Language**: Java 17+
+- **Database ORM**: JPA/Hibernate
+- **API Documentation**: Swagger/OpenAPI (SpringDoc)
+- **Port**: 8080
+
+### Backend (.NET Core)
+- **Framework**: ASP.NET Core
+- **Language**: C#
+- **Database ORM**: Entity Framework Core
+- **API Documentation**: Swagger/OpenAPI (Swashbuckle)
 - **Port**: 8080
 
 ### Frontend
@@ -729,16 +769,20 @@ npm run dev:frontend
 
 ### API Documentation
 
-Both backends provide Swagger UI for interactive API documentation:
+All backends provide Swagger UI for interactive API documentation:
 
 - **Node Backend**: http://localhost:8080/api/swagger
 - **Python Backend**: http://localhost:8080/api/swagger
+- **Java Backend**: http://localhost:8080/api/swagger
+- **.NET Backend**: http://localhost:8080/api/swagger
 
 You can also view the OpenAPI specifications:
 - **Node Backend JSON**: http://localhost:8080/api/openapi.json
 - **Node Backend YAML**: http://localhost:8080/api/openapi.yaml
 - **Python Backend JSON**: http://localhost:8080/api/openapi.json
 - **Python Backend YAML**: http://localhost:8080/api/openapi.yaml
+- **Java Backend JSON**: http://localhost:8080/api/openapi
+- **.NET Backend JSON**: http://localhost:8080/api/swagger/v1/swagger.json
 
 ### Build for Production
 
@@ -900,11 +944,12 @@ async def get_users(db: Session = Depends(get_db)):
 - No deployment configurations included (local development only)
 - No authentication setup (minimal setup)
 - No extra UI libraries (just React + basic styling)
-- Both backends can run simultaneously on different ports
-- Node backend includes Prisma ORM with empty schema
-- Python backend includes SQLAlchemy ORM with database module
-- Both backends support PostgreSQL with their respective ORMs
+- All backends can run on port 8080 (choose one for your project)
+- **Node backend** includes Prisma ORM with empty schema (pre-configured)
+- **Python backend** includes SQLAlchemy ORM with database module (pre-configured)
+- **Java backend** and **.NET backend** are available for teams that prefer those technologies
+- All backends support PostgreSQL with their respective ORMs
 - Frontend uses native fetch API for direct backend communication
 - API base URL is configurable via `VITE_API_BASE_URL` environment variable
 - Python backend includes database health check endpoint (`/api/health/db`)
-- Both backends provide Swagger UI for API documentation
+- All backends provide Swagger UI for API documentation
