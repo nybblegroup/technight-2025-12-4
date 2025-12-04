@@ -20,9 +20,9 @@ load_dotenv()
 
 # Create FastAPI app
 app = FastAPI(
-    title="Backend API",
-    version="1.0.0",
-    description="Minimal backend API with health check endpoint",
+    title="Nybble Event Engagement Hub API",
+    version="2.0.0",
+    description="AI-powered event engagement platform with gamification, real-time chat, and analytics",
     docs_url="/api/swagger",
     openapi_url="/api/openapi.json",
 )
@@ -37,6 +37,32 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
+# Import routers
+from routes import events, participants, questions, responses, messages, nybblers
+
+# Include routers
+app.include_router(events.router)
+app.include_router(participants.router)
+app.include_router(questions.router)
+app.include_router(responses.router)
+app.include_router(messages.router)
+app.include_router(nybblers.router)
+
+# Initialize badges on startup
+from services.gamification_service import gamification_service
+from database import SessionLocal
+
+@app.on_event("startup")
+async def startup_event():
+    """Initialize database with badges and seed data"""
+    try:
+        db = SessionLocal()
+        await gamification_service.seed_badges(db)
+        db.close()
+        print("✅ Badges seeded successfully")
+    except Exception as e:
+        print(f"⚠️  Error seeding badges: {e}")
 
 
 # Response models

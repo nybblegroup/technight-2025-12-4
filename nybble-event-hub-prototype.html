@@ -1,0 +1,1098 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Nybble Event Hub - Tech Night: AI en Producción</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --primary-color: #2563eb;
+            --secondary-color: #7c3aed;
+            --success-color: #10b981;
+            --warning-color: #f59e0b;
+            --danger-color: #ef4444;
+            --neutral-color: #6b7280;
+            --bg-gradient: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            --text-primary: #1f2937;
+            --text-secondary: #6b7280;
+            --bg-light: #f9fafb;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            background: var(--bg-gradient);
+            min-height: 100vh;
+            padding: 20px;
+            transition: background 0.6s ease;
+        }
+
+        /* Temas emocionales */
+        body.positive {
+            --bg-gradient: linear-gradient(135deg, #10b981 0%, #3b82f6 100%);
+        }
+
+        body.negative {
+            --bg-gradient: linear-gradient(135deg, #6b7280 0%, #4c1d95 100%);
+        }
+
+        body.neutral {
+            --bg-gradient: linear-gradient(135deg, #2563eb 0%, #7c3aed 100%);
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            display: grid;
+            grid-template-columns: 300px 1fr 320px;
+            gap: 20px;
+            height: calc(100vh - 40px);
+        }
+
+        /* Sidebar Rankings */
+        .sidebar {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            padding: 24px;
+            overflow-y: auto;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.15);
+        }
+
+        .sidebar h2 {
+            font-size: 18px;
+            font-weight: 700;
+            margin-bottom: 20px;
+            color: var(--text-primary);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .ranking-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 12px;
+            margin-bottom: 10px;
+            background: var(--bg-light);
+            border-radius: 12px;
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+
+        .ranking-item:hover {
+            transform: translateX(5px);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        }
+
+        .ranking-item.top-3 {
+            background: linear-gradient(135deg, #fbbf24 0%, #f59e0b 100%);
+            color: white;
+        }
+
+        .ranking-number {
+            font-size: 18px;
+            font-weight: 700;
+            min-width: 30px;
+            text-align: center;
+        }
+
+        .ranking-avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 2px solid white;
+        }
+
+        .ranking-info {
+            flex: 1;
+        }
+
+        .ranking-name {
+            font-size: 14px;
+            font-weight: 600;
+            margin-bottom: 2px;
+        }
+
+        .ranking-points {
+            font-size: 12px;
+            opacity: 0.8;
+        }
+
+        /* Main Chat Area */
+        .chat-container {
+            background: white;
+            border-radius: 20px;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.15);
+        }
+
+        .chat-header {
+            background: linear-gradient(135deg, var(--primary-color) 0%, var(--secondary-color) 100%);
+            color: white;
+            padding: 24px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .event-info h1 {
+            font-size: 24px;
+            font-weight: 700;
+            margin-bottom: 8px;
+        }
+
+        .event-meta {
+            font-size: 14px;
+            opacity: 0.9;
+            display: flex;
+            gap: 16px;
+        }
+
+        .user-score {
+            text-align: right;
+        }
+
+        .score-number {
+            font-size: 36px;
+            font-weight: 700;
+            display: block;
+        }
+
+        .score-label {
+            font-size: 12px;
+            opacity: 0.9;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .chat-messages {
+            flex: 1;
+            overflow-y: auto;
+            padding: 24px;
+            background: linear-gradient(to bottom, #f9fafb 0%, #ffffff 100%);
+        }
+
+        .message {
+            margin-bottom: 20px;
+            display: flex;
+            gap: 12px;
+            animation: slideIn 0.4s ease-out;
+        }
+
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .message.bot {
+            flex-direction: row;
+        }
+
+        .message.user {
+            flex-direction: row-reverse;
+        }
+
+        .message-avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            flex-shrink: 0;
+        }
+
+        .bot .message-avatar {
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 20px;
+        }
+
+        .message-content {
+            max-width: 70%;
+        }
+
+        .message-bubble {
+            padding: 16px 20px;
+            border-radius: 18px;
+            line-height: 1.5;
+            font-size: 15px;
+        }
+
+        .bot .message-bubble {
+            background: white;
+            border: 2px solid #e5e7eb;
+            border-radius: 18px 18px 18px 4px;
+        }
+
+        .user .message-bubble {
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            color: white;
+            border-radius: 18px 18px 4px 18px;
+        }
+
+        .message-time {
+            font-size: 12px;
+            color: var(--text-secondary);
+            margin-top: 4px;
+            padding: 0 8px;
+        }
+
+        /* Quick Options */
+        .quick-options {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin-top: 12px;
+        }
+
+        .quick-option {
+            padding: 10px 20px;
+            background: white;
+            border: 2px solid var(--primary-color);
+            color: var(--primary-color);
+            border-radius: 20px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: 14px;
+            font-weight: 600;
+        }
+
+        .quick-option:hover {
+            background: var(--primary-color);
+            color: white;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(37, 99, 235, 0.3);
+        }
+
+        /* Rating Stars */
+        .rating-stars {
+            display: flex;
+            gap: 8px;
+            margin-top: 12px;
+        }
+
+        .star {
+            font-size: 32px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            color: #d1d5db;
+        }
+
+        .star:hover,
+        .star.active {
+            color: #fbbf24;
+            transform: scale(1.2);
+        }
+
+        /* Input Area */
+        .chat-input {
+            padding: 20px 24px;
+            background: white;
+            border-top: 2px solid #e5e7eb;
+            display: flex;
+            gap: 12px;
+            align-items: center;
+        }
+
+        .input-wrapper {
+            flex: 1;
+            position: relative;
+        }
+
+        .chat-input input {
+            width: 100%;
+            padding: 14px 50px 14px 20px;
+            border: 2px solid #e5e7eb;
+            border-radius: 24px;
+            font-size: 15px;
+            transition: all 0.3s ease;
+        }
+
+        .chat-input input:focus {
+            outline: none;
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+        }
+
+        .send-button {
+            position: absolute;
+            right: 8px;
+            top: 50%;
+            transform: translateY(-50%);
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            border: none;
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            color: white;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s ease;
+        }
+
+        .send-button:hover {
+            transform: translateY(-50%) scale(1.1);
+        }
+
+        .send-button:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        /* Right Sidebar - Stats */
+        .stats-sidebar {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            padding: 24px;
+            overflow-y: auto;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.15);
+        }
+
+        .stat-card {
+            background: var(--bg-light);
+            padding: 20px;
+            border-radius: 16px;
+            margin-bottom: 16px;
+            transition: all 0.3s ease;
+        }
+
+        .stat-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
+        }
+
+        .stat-label {
+            font-size: 12px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            color: var(--text-secondary);
+            margin-bottom: 8px;
+            font-weight: 600;
+        }
+
+        .stat-value {
+            font-size: 32px;
+            font-weight: 700;
+            color: var(--primary-color);
+        }
+
+        .badge-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 12px;
+            margin-top: 16px;
+        }
+
+        .badge {
+            background: white;
+            padding: 12px;
+            border-radius: 12px;
+            text-align: center;
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+
+        .badge.unlocked {
+            background: linear-gradient(135deg, #fbbf24 0%, #f59e0b 100%);
+            color: white;
+            box-shadow: 0 4px 12px rgba(251, 191, 36, 0.3);
+        }
+
+        .badge.locked {
+            opacity: 0.4;
+            filter: grayscale(1);
+        }
+
+        .badge-icon {
+            font-size: 28px;
+            margin-bottom: 4px;
+        }
+
+        .badge-name {
+            font-size: 10px;
+            font-weight: 600;
+        }
+
+        /* Confetti Animation */
+        .confetti {
+            position: fixed;
+            width: 10px;
+            height: 10px;
+            background: var(--primary-color);
+            position: absolute;
+            animation: confetti-fall 3s linear forwards;
+            pointer-events: none;
+        }
+
+        @keyframes confetti-fall {
+            to {
+                transform: translateY(100vh) rotate(360deg);
+                opacity: 0;
+            }
+        }
+
+        /* Progress Bar */
+        .progress-container {
+            margin: 20px 0;
+            background: #e5e7eb;
+            border-radius: 10px;
+            height: 8px;
+            overflow: hidden;
+        }
+
+        .progress-bar {
+            height: 100%;
+            background: linear-gradient(90deg, var(--success-color), var(--primary-color));
+            transition: width 0.5s ease;
+            border-radius: 10px;
+        }
+
+        /* Typing Indicator */
+        .typing-indicator {
+            display: flex;
+            gap: 4px;
+            padding: 16px 20px;
+        }
+
+        .typing-dot {
+            width: 8px;
+            height: 8px;
+            background: var(--text-secondary);
+            border-radius: 50%;
+            animation: typing 1.4s infinite;
+        }
+
+        .typing-dot:nth-child(2) {
+            animation-delay: 0.2s;
+        }
+
+        .typing-dot:nth-child(3) {
+            animation-delay: 0.4s;
+        }
+
+        @keyframes typing {
+            0%, 60%, 100% {
+                transform: translateY(0);
+            }
+            30% {
+                transform: translateY(-10px);
+            }
+        }
+
+        /* Responsive */
+        @media (max-width: 1200px) {
+            .container {
+                grid-template-columns: 1fr;
+            }
+
+            .sidebar,
+            .stats-sidebar {
+                display: none;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                padding: 10px;
+                height: calc(100vh - 20px);
+            }
+
+            .chat-header {
+                padding: 16px;
+            }
+
+            .event-info h1 {
+                font-size: 18px;
+            }
+
+            .score-number {
+                font-size: 28px;
+            }
+
+            .message-content {
+                max-width: 85%;
+            }
+        }
+
+        /* Pulse Animation for Points */
+        @keyframes pulse {
+            0%, 100% {
+                transform: scale(1);
+            }
+            50% {
+                transform: scale(1.1);
+            }
+        }
+
+        .pulse {
+            animation: pulse 0.5s ease;
+        }
+
+        /* Celebration */
+        .celebration {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            font-size: 72px;
+            animation: celebrate 1s ease-out;
+            pointer-events: none;
+            z-index: 1000;
+        }
+
+        @keyframes celebrate {
+            0% {
+                transform: translate(-50%, -50%) scale(0);
+                opacity: 0;
+            }
+            50% {
+                transform: translate(-50%, -50%) scale(1.2);
+                opacity: 1;
+            }
+            100% {
+                transform: translate(-50%, -50%) scale(1);
+                opacity: 0;
+            }
+        }
+    </style>
+</head>
+<body class="neutral">
+    <div class="container">
+        <!-- Left Sidebar - Rankings -->
+        <aside class="sidebar">
+            <h2>🏆 Top 10 Participantes</h2>
+            <div id="rankingList">
+                <div class="ranking-item top-3">
+                    <div class="ranking-number">1</div>
+                    <img src="https://i.pravatar.cc/150?img=1" alt="Avatar" class="ranking-avatar">
+                    <div class="ranking-info">
+                        <div class="ranking-name">María González</div>
+                        <div class="ranking-points">1,250 pts • 🔥 Racha 8</div>
+                    </div>
+                </div>
+                <div class="ranking-item top-3">
+                    <div class="ranking-number">2</div>
+                    <img src="https://i.pravatar.cc/150?img=2" alt="Avatar" class="ranking-avatar">
+                    <div class="ranking-info">
+                        <div class="ranking-name">Carlos Ruiz</div>
+                        <div class="ranking-points">1,180 pts • 💎 Master</div>
+                    </div>
+                </div>
+                <div class="ranking-item top-3">
+                    <div class="ranking-number">3</div>
+                    <img src="https://i.pravatar.cc/150?img=3" alt="Avatar" class="ranking-avatar">
+                    <div class="ranking-info">
+                        <div class="ranking-name">Ana Martínez</div>
+                        <div class="ranking-points">1,050 pts</div>
+                    </div>
+                </div>
+                <div class="ranking-item">
+                    <div class="ranking-number">4</div>
+                    <img src="https://i.pravatar.cc/150?img=4" alt="Avatar" class="ranking-avatar">
+                    <div class="ranking-info">
+                        <div class="ranking-name">Luis Torres</div>
+                        <div class="ranking-points">920 pts</div>
+                    </div>
+                </div>
+                <div class="ranking-item">
+                    <div class="ranking-number">5</div>
+                    <img src="https://i.pravatar.cc/150?img=5" alt="Avatar" class="ranking-avatar">
+                    <div class="ranking-info">
+                        <div class="ranking-name">Tú</div>
+                        <div class="ranking-points">850 pts</div>
+                    </div>
+                </div>
+            </div>
+
+            <h2 style="margin-top: 32px;">💎 Top Respuestas</h2>
+            <div class="stat-card" style="font-size: 13px; line-height: 1.6;">
+                <strong>María G.:</strong> "Me encantó cómo explicaron el trade-off entre latencia y throughput. Creo que podríamos aplicarlo en..."
+            </div>
+            <div class="stat-card" style="font-size: 13px; line-height: 1.6;">
+                <strong>Carlos R.:</strong> "La demo de embeddings fue reveladora. ¿Tienen documentación sobre el fine-tuning?"
+            </div>
+        </aside>
+
+        <!-- Main Chat Container -->
+        <main class="chat-container">
+            <header class="chat-header">
+                <div class="event-info">
+                    <h1>Tech Night: AI en Producción</h1>
+                    <div class="event-meta">
+                        <span>📅 Hoy, 18:00hs</span>
+                        <span>👥 87 participantes</span>
+                        <span>⏱️ En vivo</span>
+                    </div>
+                </div>
+                <div class="user-score">
+                    <span class="score-number" id="userScore">850</span>
+                    <span class="score-label">Puntos</span>
+                </div>
+            </header>
+
+            <div class="progress-container">
+                <div class="progress-bar" id="progressBar" style="width: 40%;"></div>
+            </div>
+
+            <div class="chat-messages" id="chatMessages">
+                <div class="message bot">
+                    <div class="message-avatar">🤖</div>
+                    <div class="message-content">
+                        <div class="message-bubble">
+                            ¡Hola! 👋 Bienvenido al Tech Night de hoy. Soy tu asistente IA y voy a guiarte en esta experiencia.
+                            <br><br>
+                            Tus respuestas nos ayudan a mejorar y vos ganás puntos para el ranking. ¡Empecemos! 🚀
+                        </div>
+                        <div class="message-time">18:05</div>
+                    </div>
+                </div>
+
+                <div class="message bot">
+                    <div class="message-avatar">🤖</div>
+                    <div class="message-content">
+                        <div class="message-bubble">
+                            Pregunta 1 de 5:<br>
+                            <strong>¿Qué te motivó a unirte a este evento hoy?</strong>
+                        </div>
+                        <div class="quick-options">
+                            <button class="quick-option" onclick="selectQuickAnswer('Aprender sobre IA')">💡 Aprender sobre IA</button>
+                            <button class="quick-option" onclick="selectQuickAnswer('Networking')">🤝 Networking</button>
+                            <button class="quick-option" onclick="selectQuickAnswer('El speaker')">🎤 El speaker</button>
+                            <button class="quick-option" onclick="selectQuickAnswer('Otro motivo')">✍️ Escribir mi respuesta</button>
+                        </div>
+                        <div class="message-time">18:05</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="chat-input">
+                <div class="input-wrapper">
+                    <input 
+                        type="text" 
+                        id="messageInput" 
+                        placeholder="Escribe tu respuesta..." 
+                        onkeypress="handleKeyPress(event)"
+                    >
+                    <button class="send-button" onclick="sendMessage()">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M22 2L11 13M22 2l-7 20-4-9-9-4 20-7z"/>
+                        </svg>
+                    </button>
+                </div>
+            </div>
+        </main>
+
+        <!-- Right Sidebar - Stats & Badges -->
+        <aside class="stats-sidebar">
+            <h2>📊 Tu Progreso</h2>
+            
+            <div class="stat-card">
+                <div class="stat-label">Eventos Completados</div>
+                <div class="stat-value">12</div>
+            </div>
+
+            <div class="stat-card">
+                <div class="stat-label">Racha Actual</div>
+                <div class="stat-value" style="color: #f59e0b;">5 🔥</div>
+            </div>
+
+            <div class="stat-card">
+                <div class="stat-label">Próximo Badge</div>
+                <div style="font-size: 14px; margin-top: 8px; color: var(--text-secondary);">
+                    🎯 <strong>Perfectionist</strong><br>
+                    Completa 100% de respuestas<br>
+                    <div class="progress-container" style="margin-top: 8px;">
+                        <div class="progress-bar" style="width: 80%;"></div>
+                    </div>
+                    <small>4 de 5 respuestas</small>
+                </div>
+            </div>
+
+            <h2 style="margin-top: 32px;">🏅 Tus Badges</h2>
+            <div class="badge-grid">
+                <div class="badge unlocked">
+                    <div class="badge-icon">🎤</div>
+                    <div class="badge-name">FIRST VOICE</div>
+                </div>
+                <div class="badge unlocked">
+                    <div class="badge-icon">🔥</div>
+                    <div class="badge-name">ON FIRE</div>
+                </div>
+                <div class="badge locked">
+                    <div class="badge-icon">💎</div>
+                    <div class="badge-name">INSIGHT MASTER</div>
+                </div>
+                <div class="badge locked">
+                    <div class="badge-icon">👑</div>
+                    <div class="badge-name">COMMUNITY LEADER</div>
+                </div>
+                <div class="badge locked">
+                    <div class="badge-icon">🎯</div>
+                    <div class="badge-name">PERFECTIONIST</div>
+                </div>
+                <div class="badge locked">
+                    <div class="badge-icon">⚡</div>
+                    <div class="badge-name">SPEED DEMON</div>
+                </div>
+            </div>
+
+            <h2 style="margin-top: 32px;">🌟 Top Eventos</h2>
+            <div class="stat-card" style="font-size: 13px;">
+                <strong>1. Workshop: React Avanzado</strong><br>
+                <small>⭐ 9.2/10 • 95% participación</small>
+            </div>
+            <div class="stat-card" style="font-size: 13px;">
+                <strong>2. Tech Talk: Microservicios</strong><br>
+                <small>⭐ 8.9/10 • 88% participación</small>
+            </div>
+        </aside>
+    </div>
+
+    <script>
+        let currentScore = 850;
+        let messageCount = 0;
+        let currentQuestion = 1;
+        const totalQuestions = 5;
+        let currentSentiment = 'neutral';
+
+        const questions = [
+            {
+                text: "¿Qué aspecto técnico te resultó más interesante de la presentación?",
+                type: "open",
+                options: []
+            },
+            {
+                text: "Del 1 al 5, ¿qué tan clara fue la explicación sobre embeddings?",
+                type: "rating",
+                options: []
+            },
+            {
+                text: "¿Implementarías alguna de las técnicas mostradas en tu proyecto actual?",
+                type: "options",
+                options: ["Definitivamente sí", "Probablemente", "Necesito investigar más", "No aplica a mi caso"]
+            },
+            {
+                text: "¿Qué te gustaría que profundicemos en la próxima sesión?",
+                type: "open",
+                options: []
+            }
+        ];
+
+        // Analizar sentimiento de respuesta
+        function analyzeSentiment(text) {
+            const positiveWords = ['excelente', 'genial', 'bueno', 'útil', 'claro', 'interesante', 'me encanta', 'definitivamente', 'sí'];
+            const negativeWords = ['confuso', 'difícil', 'no entendí', 'malo', 'aburrido', 'no', 'complicado'];
+            
+            const lowerText = text.toLowerCase();
+            const hasPositive = positiveWords.some(word => lowerText.includes(word));
+            const hasNegative = negativeWords.some(word => lowerText.includes(word));
+            
+            if (hasPositive && !hasNegative) return 'positive';
+            if (hasNegative && !hasPositive) return 'negative';
+            return 'neutral';
+        }
+
+        // Cambiar tema según sentimiento
+        function changeTheme(sentiment) {
+            currentSentiment = sentiment;
+            document.body.className = sentiment;
+            
+            if (sentiment === 'positive') {
+                showCelebration('🎉');
+                createConfetti();
+            } else if (sentiment === 'negative') {
+                showCelebration('💙');
+            }
+        }
+
+        // Crear confetti
+        function createConfetti() {
+            const colors = ['#10b981', '#3b82f6', '#8b5cf6', '#f59e0b', '#ef4444'];
+            for (let i = 0; i < 50; i++) {
+                const confetti = document.createElement('div');
+                confetti.className = 'confetti';
+                confetti.style.left = Math.random() * 100 + '%';
+                confetti.style.background = colors[Math.floor(Math.random() * colors.length)];
+                confetti.style.animationDelay = Math.random() * 0.5 + 's';
+                document.body.appendChild(confetti);
+                
+                setTimeout(() => confetti.remove(), 3000);
+            }
+        }
+
+        // Mostrar celebración
+        function showCelebration(emoji) {
+            const celebration = document.createElement('div');
+            celebration.className = 'celebration';
+            celebration.textContent = emoji;
+            document.body.appendChild(celebration);
+            
+            setTimeout(() => celebration.remove(), 1000);
+        }
+
+        // Enviar mensaje
+        function sendMessage() {
+            const input = document.getElementById('messageInput');
+            const message = input.value.trim();
+            
+            if (!message) return;
+            
+            // Agregar mensaje del usuario
+            addMessage('user', message);
+            input.value = '';
+            
+            // Analizar sentimiento
+            const sentiment = analyzeSentiment(message);
+            changeTheme(sentiment);
+            
+            // Calcular puntos
+            let points = 10;
+            if (message.length > 50) points += 5;
+            if (sentiment === 'positive') points += 10;
+            if (message.length > 100) points += 20;
+            
+            addPoints(points);
+            
+            // Mostrar typing indicator
+            showTypingIndicator();
+            
+            // Respuesta del bot después de 2 segundos
+            setTimeout(() => {
+                hideTypingIndicator();
+                
+                if (currentQuestion < totalQuestions) {
+                    askNextQuestion();
+                } else {
+                    finishSurvey();
+                }
+            }, 2000);
+        }
+
+        // Agregar mensaje al chat
+        function addMessage(type, content, options = null) {
+            const messagesContainer = document.getElementById('chatMessages');
+            const time = new Date().toLocaleTimeString('es-AR', { hour: '2-digit', minute: '2-digit' });
+            
+            const messageDiv = document.createElement('div');
+            messageDiv.className = `message ${type}`;
+            
+            if (type === 'bot') {
+                messageDiv.innerHTML = `
+                    <div class="message-avatar">🤖</div>
+                    <div class="message-content">
+                        <div class="message-bubble">${content}</div>
+                        ${options ? options : ''}
+                        <div class="message-time">${time}</div>
+                    </div>
+                `;
+            } else {
+                messageDiv.innerHTML = `
+                    <div class="message-content">
+                        <div class="message-bubble">${content}</div>
+                        <div class="message-time">${time}</div>
+                    </div>
+                `;
+            }
+            
+            messagesContainer.appendChild(messageDiv);
+            messagesContainer.scrollTop = messagesContainer.scrollHeight;
+        }
+
+        // Mostrar indicador de escritura
+        function showTypingIndicator() {
+            const messagesContainer = document.getElementById('chatMessages');
+            const typingDiv = document.createElement('div');
+            typingDiv.className = 'message bot';
+            typingDiv.id = 'typingIndicator';
+            typingDiv.innerHTML = `
+                <div class="message-avatar">🤖</div>
+                <div class="message-content">
+                    <div class="message-bubble typing-indicator">
+                        <div class="typing-dot"></div>
+                        <div class="typing-dot"></div>
+                        <div class="typing-dot"></div>
+                    </div>
+                </div>
+            `;
+            messagesContainer.appendChild(typingDiv);
+            messagesContainer.scrollTop = messagesContainer.scrollHeight;
+        }
+
+        function hideTypingIndicator() {
+            const typing = document.getElementById('typingIndicator');
+            if (typing) typing.remove();
+        }
+
+        // Hacer próxima pregunta
+        function askNextQuestion() {
+            currentQuestion++;
+            updateProgress();
+            
+            const question = questions[currentQuestion - 2];
+            
+            if (question.type === 'rating') {
+                const stars = `
+                    <div class="rating-stars">
+                        <span class="star" onclick="selectRating(1)">⭐</span>
+                        <span class="star" onclick="selectRating(2)">⭐</span>
+                        <span class="star" onclick="selectRating(3)">⭐</span>
+                        <span class="star" onclick="selectRating(4)">⭐</span>
+                        <span class="star" onclick="selectRating(5)">⭐</span>
+                    </div>
+                `;
+                addMessage('bot', `Pregunta ${currentQuestion} de ${totalQuestions}:<br><strong>${question.text}</strong>`, stars);
+            } else if (question.type === 'options') {
+                const options = question.options.map(opt => 
+                    `<button class="quick-option" onclick="selectQuickAnswer('${opt}')">${opt}</button>`
+                ).join('');
+                addMessage('bot', `Pregunta ${currentQuestion} de ${totalQuestions}:<br><strong>${question.text}</strong>`, 
+                    `<div class="quick-options">${options}</div>`);
+            } else {
+                addMessage('bot', `Pregunta ${currentQuestion} de ${totalQuestions}:<br><strong>${question.text}</strong>`);
+            }
+        }
+
+        // Seleccionar respuesta rápida
+        function selectQuickAnswer(answer) {
+            addMessage('user', answer);
+            
+            const sentiment = analyzeSentiment(answer);
+            changeTheme(sentiment);
+            
+            addPoints(15);
+            
+            showTypingIndicator();
+            setTimeout(() => {
+                hideTypingIndicator();
+                if (currentQuestion < totalQuestions) {
+                    askNextQuestion();
+                } else {
+                    finishSurvey();
+                }
+            }, 1500);
+        }
+
+        // Seleccionar rating
+        function selectRating(rating) {
+            const stars = document.querySelectorAll('.star');
+            stars.forEach((star, index) => {
+                if (index < rating) {
+                    star.classList.add('active');
+                }
+            });
+            
+            setTimeout(() => {
+                const sentiment = rating >= 4 ? 'positive' : rating <= 2 ? 'negative' : 'neutral';
+                addMessage('user', `⭐ ${rating} de 5`);
+                changeTheme(sentiment);
+                addPoints(10);
+                
+                showTypingIndicator();
+                setTimeout(() => {
+                    hideTypingIndicator();
+                    if (currentQuestion < totalQuestions) {
+                        askNextQuestion();
+                    } else {
+                        finishSurvey();
+                    }
+                }, 1500);
+            }, 500);
+        }
+
+        // Agregar puntos
+        function addPoints(points) {
+            currentScore += points;
+            const scoreElement = document.getElementById('userScore');
+            scoreElement.textContent = currentScore;
+            scoreElement.classList.add('pulse');
+            
+            // Mostrar notificación de puntos
+            const notification = document.createElement('div');
+            notification.style.cssText = `
+                position: fixed;
+                top: 50%;
+                right: 30px;
+                background: linear-gradient(135deg, #10b981, #3b82f6);
+                color: white;
+                padding: 16px 24px;
+                border-radius: 12px;
+                font-weight: 700;
+                font-size: 18px;
+                box-shadow: 0 8px 20px rgba(0,0,0,0.2);
+                animation: slideIn 0.5s ease;
+                z-index: 1000;
+            `;
+            notification.textContent = `+${points} puntos! 🎉`;
+            document.body.appendChild(notification);
+            
+            setTimeout(() => {
+                notification.style.animation = 'slideIn 0.5s ease reverse';
+                setTimeout(() => notification.remove(), 500);
+            }, 2000);
+            
+            setTimeout(() => scoreElement.classList.remove('pulse'), 500);
+        }
+
+        // Actualizar progreso
+        function updateProgress() {
+            const progress = (currentQuestion / totalQuestions) * 100;
+            document.getElementById('progressBar').style.width = progress + '%';
+        }
+
+        // Finalizar encuesta
+        function finishSurvey() {
+            addMessage('bot', `
+                🎊 ¡Encuesta completada! Muchas gracias por tu feedback.<br><br>
+                <strong>Resumen:</strong><br>
+                • Ganaste ${currentScore - 850} puntos en esta sesión<br>
+                • Desbloqueaste el badge 🎯 "Perfectionist"<br>
+                • Subiste al puesto #4 en el ranking<br><br>
+                Tu opinión nos ayuda a mejorar. ¡Nos vemos en el próximo evento! 🚀
+            `);
+            
+            createConfetti();
+            showCelebration('🏆');
+            
+            // Simular desbloqueo de badge
+            setTimeout(() => {
+                const badges = document.querySelectorAll('.badge.locked');
+                if (badges[2]) {
+                    badges[2].classList.remove('locked');
+                    badges[2].classList.add('unlocked');
+                }
+            }, 1000);
+        }
+
+        // Handle Enter key
+        function handleKeyPress(event) {
+            if (event.key === 'Enter') {
+                sendMessage();
+            }
+        }
+
+        // Auto-scroll
+        const chatMessages = document.getElementById('chatMessages');
+        chatMessages.scrollTop = chatMessages.scrollHeight;
+    </script>
+</body>
+</html>
